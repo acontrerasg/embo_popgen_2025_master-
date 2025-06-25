@@ -41,7 +41,6 @@ diversities = [result[2] for result in results]
 tajimas_ds = [result[3] for result in results]
 allele_frequency_spectra = [result[4] for result in results]
 
-
 plt.clf()
 plt.figure(figsize=(10, 5))
 plt.hist(diversities, bins=10, color='skyblue', edgecolor='black', alpha=0.7)
@@ -49,7 +48,6 @@ plt.xlabel("Nucleotide Diversity (π)")
 plt.ylabel("Frequency")
 plt.title("Histogram of Nucleotide Diversity Across Simulations")
 plt.show()
-
 
 plt.clf()
 plt.figure(figsize=(10, 5))
@@ -59,11 +57,11 @@ plt.ylabel("Frequency")
 plt.title("Distribution of Tajima's D Across Simulations")
 plt.show()
 
-
 plt.clf()
 plt.figure(figsize=(10, 5))
 bar_width = 0.8 / num_simulations 
 colors = plt.cm.tab20(np.linspace(0, 1, num_simulations)) 
+
 for i, afs in enumerate(allele_frequency_spectra):
     x_positions = np.arange(len(afs)) + i * bar_width  
     plt.bar(x_positions, afs, width=bar_width, color=colors[i], label=f'Simulation {i+1}')
