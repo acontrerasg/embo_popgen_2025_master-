@@ -133,3 +133,48 @@ with open(output_file, "w", newline="") as csvfile:
 
 
 ```
+
+
+```{python}
+def repeat_simulations(mut, sample_sizes, length, reco, num_simulations, seed=None):
+    results = []
+    N1=150000
+    N2=5000
+    # Parameters
+    Nanc=7e6
+    m=0
+    for i in tqdm(range(num_simulations), desc="Running simulations"):
+      if seed is not None:
+          np.random.seed(seed + i)      # Define sample sets for each population (e.g., 10 samples in N1, 10 in N2)
+      samples = [
+          msprime.SampleSet(sample_sizes[0], population="N1", ploidy=2),
+          msprime.SampleSet(sample_sizes[1], population="N2", ploidy=2)
+      ]
+      # Generate the demography
+      Tsplit=random.normalvariate(8000, 1000)
+      demography=IM_demography(N1,N2,Nanc,m, Tsplit)      ts = msprime.sim_ancestry(
+          samples=samples,
+          recombination_rate=reco,
+          sequence_length=length,
+          demography=demography,
+          random_seed=np.random.randint(99999999)
+      )      # Get sample nodes per population
+      samples_pop0 = ts.samples(population=0)
+      samples_pop1 = ts.samples(population=1)
+      # After simulating mutations
+      mutated_ts = msprime.sim_mutations(ts, rate=mut, random_seed=np.random.randint(99999999))
+      # Compute statistics per population
+      diversity = mutated_ts.diversity(sample_sets=[samples_pop0, samples_pop1])
+      tajimas_d= mutated_ts.Tajimas_D(sample_sets=[samples_pop0, samples_pop1])
+      # Compute statistics per population
+      diversity = mutated_ts.diversity(sample_sets=[samples_pop0, samples_pop1])      # Fst
+      fst = mutated_ts.Fst(sample_sets=[samples_pop0, samples_pop1])
+      # Dxy (genetic distance)
+      dxy = mutated_ts.divergence(sample_sets=[samples_pop0, samples_pop1])
+      # Number of segregating sites
+      seg_sites= mutated_ts.segregating_sites(sample_sets=[samples_pop0, samples_pop1])
+      results.append((fst, dxy, seg_sites,  diversity, tajimas_d))
+    return results
+  
+```
+
